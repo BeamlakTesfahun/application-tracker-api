@@ -1,0 +1,16 @@
+services:
+    db:
+        image: postgres:16
+        container_name: app-tracker-postgres
+        restart: unless-stopped
+        ports:
+            - '5433:5432'
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: devpassword
+            POSTGRES_DB: app_tracker
+        volumes:
+            - app_tracker_pgdata:/var/lib/postgresql/data
+
+volumes:
+    app_tracker_pgdata:
