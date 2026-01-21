@@ -28,6 +28,10 @@ export class CreateEventDto {
     scheduledAt?: string
 
     @IsOptional()
+    @IsISO8601()
+    remindAt?: string
+
+    @IsOptional()
     @IsString()
     @MaxLength(4000)
     notes?: string
