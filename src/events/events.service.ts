@@ -51,6 +51,7 @@ export class EventsService {
                     ? new Date(dto.scheduledAt)
                     : undefined,
                 notes: dto.notes,
+                remindAt: dto.remindAt ? new Date(dto.remindAt) : undefined,
             },
         })
 
@@ -90,6 +91,8 @@ export class EventsService {
                         : dto.completedAt
                         ? new Date(dto.completedAt)
                         : undefined,
+                remindAt: dto.remindAt ? new Date(dto.remindAt) : undefined,
+                reminderSentAt: dto.remindAt ? null : undefined,
             },
         })
 
