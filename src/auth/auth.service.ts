@@ -18,12 +18,12 @@ export class AuthService {
     constructor(
         private prisma: PrismaService,
         private jwt: JwtService,
-        private config: ConfigService
+        private config: ConfigService,
     ) {
         this.refreshCookieName =
             this.config.get<string>('REFRESH_COOKIE_NAME') ?? 'refresh_token'
         this.refreshCookieDays = Number(
-            this.config.get<string>('REFRESH_COOKIE_DAYS') ?? '7'
+            this.config.get<string>('REFRESH_COOKIE_DAYS') ?? '7',
         )
     }
 
@@ -35,7 +35,7 @@ export class AuthService {
         email: string,
         password: string,
         firstName: string,
-        lastName: string
+        lastName: string,
     ) {
         const existing = await this.prisma.user.findUnique({ where: { email } })
         if (existing) throw new ForbiddenException('Email already in use')
@@ -63,7 +63,7 @@ export class AuthService {
 
         const { accessToken, refreshToken } = await this.issueTokens(
             user.id,
-            user.email
+            user.email,
         )
 
         await this.storeRefreshTokenHash(user.id, refreshToken)
@@ -144,7 +144,7 @@ export class AuthService {
             {
                 secret: this.config.getOrThrow<string>('JWT_ACCESS_SECRET'),
                 expiresIn: accessExpires as any,
-            }
+            },
         )
 
         const refreshToken = await this.jwt.signAsync(
@@ -152,7 +152,7 @@ export class AuthService {
             {
                 secret: this.config.getOrThrow<string>('JWT_REFRESH_SECRET'),
                 expiresIn: refreshExpires as any,
-            }
+            },
         )
 
         return { accessToken, refreshToken }

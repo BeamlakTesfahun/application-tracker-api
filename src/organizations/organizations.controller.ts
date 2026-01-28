@@ -38,7 +38,7 @@ export class OrganizationsController {
     update(
         @Req() req: any,
         @Param('id') id: string,
-        @Body() dto: UpdateOrganizationDto
+        @Body() dto: UpdateOrganizationDto,
     ) {
         return this.service.update(req.user.userId, id, dto)
     }

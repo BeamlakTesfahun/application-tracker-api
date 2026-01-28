@@ -13,29 +13,32 @@ import { AuthService } from './auth.service'
 import { RegisterDto } from './dto/register.dto'
 import { LoginDto } from './dto/login.dto'
 import { JwtAuthGuard } from './jwt/jwt-auth.guard' // adjust path if yours differs
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler'
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly auth: AuthService,
-        private readonly config: ConfigService
+        private readonly config: ConfigService,
     ) {}
 
+    @Throttle({ default: { ttl: 60, limit: 3 } })
     @Post('register')
     async register(@Body() dto: RegisterDto) {
         const user = await this.auth.register(
             dto.email,
             dto.password,
             dto.firstName,
-            dto.lastName
+            dto.lastName,
         )
         return { user }
     }
 
+    @Throttle({ default: { ttl: 10, limit: 2 } })
     @Post('login')
     async login(
         @Body() dto: LoginDto,
-        @Res({ passthrough: true }) res: Response // modify the response object
+        @Res({ passthrough: true }) res: Response, // modify the response object
     ) {
         const result = await this.auth.login(dto.email, dto.password)
 
@@ -43,17 +46,18 @@ export class AuthController {
         res.cookie(
             this.auth.getRefreshCookieName(),
             result.refreshToken,
-            this.cookieOptions()
+            this.cookieOptions(),
         )
 
         // return access token + user
         return { user: result.user, accessToken: result.tokens.accessToken }
     }
 
+    @Throttle({ default: { ttl: 60, limit: 10 } })
     @Post('refresh')
     async refresh(
         @Req() req: Request,
-        @Res({ passthrough: true }) res: Response
+        @Res({ passthrough: true }) res: Response,
     ) {
         const cookieName = this.auth.getRefreshCookieName()
         const refreshToken = req.cookies?.[cookieName]
@@ -75,7 +79,7 @@ export class AuthController {
     @Post('logout')
     async logout(
         @Req() req: Request,
-        @Res({ passthrough: true }) res: Response
+        @Res({ passthrough: true }) res: Response,
     ) {
         const cookieName = this.auth.getRefreshCookieName()
         const refreshToken = req.cookies?.[cookieName]
@@ -102,7 +106,7 @@ export class AuthController {
 
     private cookieOptions() {
         const days = Number(
-            this.config.get<string>('REFRESH_COOKIE_DAYS') ?? '7'
+            this.config.get<string>('REFRESH_COOKIE_DAYS') ?? '7',
         )
         const secure =
             (this.config.get<string>('COOKIE_SECURE') ?? 'false') === 'true'

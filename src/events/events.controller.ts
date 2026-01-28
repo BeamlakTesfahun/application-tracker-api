@@ -24,7 +24,7 @@ export class EventsController {
     create(
         @Req() req: any,
         @Param('applicationId') applicationId: string,
-        @Body() dto: CreateEventDto
+        @Body() dto: CreateEventDto,
     ) {
         return this.service.create(req.user.userId, applicationId, dto)
     }
@@ -40,7 +40,7 @@ export class EventsController {
     update(
         @Req() req: any,
         @Param('id') id: string,
-        @Body() dto: UpdateEventDto
+        @Body() dto: UpdateEventDto,
     ) {
         return this.service.update(req.user.userId, id, dto)
     }
